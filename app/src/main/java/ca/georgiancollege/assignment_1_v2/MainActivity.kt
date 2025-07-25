@@ -1,6 +1,5 @@
 package ca.georgiancollege.assignment_1_v2
 
-import MovieViewModel
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -8,12 +7,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import ca.georgiancollege.assignment_1_v2.databinding.ActivityMainBinding
 
-
-
 class MainActivity : AppCompatActivity() {
+
    private lateinit var binding: ActivityMainBinding
    private val viewModel: MovieViewModel by viewModels()
-   private lateinit var adapter: MovieAdapter
+   private lateinit var movieAdapter: MovieAdapter
    private val apiKey = "25c87dc7"
 
    override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,24 +19,24 @@ class MainActivity : AppCompatActivity() {
       binding = ActivityMainBinding.inflate(layoutInflater)
       setContentView(binding.root)
 
-      adapter = MovieAdapter { imdbID ->
-         val intent = Intent(this, DetailsActivity::class.java)
-         intent.putExtra("imdbID", imdbID)
-         startActivity(intent)
+      movieAdapter = MovieAdapter { imdbID ->
+         val detailsIntent = Intent(this, DetailsActivity::class.java)
+         detailsIntent.putExtra("imdbID", imdbID)
+         startActivity(detailsIntent)
       }
 
       binding.movieRecycler.layoutManager = LinearLayoutManager(this)
-      binding.movieRecycler.adapter = adapter
+      binding.movieRecycler.adapter = movieAdapter
 
       binding.searchButton.setOnClickListener {
-         val query = binding.searchInput.text.toString()
-         if (query.isNotBlank()) {
-            viewModel.searchMovies(query, apiKey)
+         val searchQuery = binding.searchInput.text.toString()
+         if (searchQuery.isNotBlank()) {
+            viewModel.searchForMovies(searchQuery, apiKey)
          }
       }
 
-      viewModel.moviesLiveData.observe(this) { movies ->
-         adapter.submitList(movies)
+      viewModel.searchResults.observe(this) { movieList ->
+         movieAdapter.submitList(movieList)
       }
    }
 }

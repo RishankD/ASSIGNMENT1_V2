@@ -1,32 +1,24 @@
 package ca.georgiancollege.assignment_1_v2
 
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 object MovieRepository {
-   fun searchMovies(query: String, apiKey: String): String {
-      val url = URL("https://www.omdbapi.com/?s=$query&apikey=$apiKey")
-      val conn = url.openConnection() as HttpURLConnection
-      conn.requestMethod = "GET"
+   private val httpClient = OkHttpClient()
 
-      val reader = BufferedReader(InputStreamReader(conn.inputStream))
-      val result = reader.readText()
-      reader.close()
-
-      return result
+   fun fetchSearchResults(query: String, apiKey: String): String {
+      val apiUrl = "https://www.omdbapi.com/?s=$query&apikey=$apiKey"
+      val request = Request.Builder().url(apiUrl).build()
+      httpClient.newCall(request).execute().use { response ->
+         return response.body?.string() ?: ""
+      }
    }
 
-   fun fetchMovieDetails(imdbID: String, apiKey: String): String {
-      val url = URL("https://www.omdbapi.com/?i=$imdbID&apikey=$apiKey")
-      val conn = url.openConnection() as HttpURLConnection
-      conn.requestMethod = "GET"
-
-      val reader = BufferedReader(InputStreamReader(conn.inputStream))
-      val result = reader.readText()
-      reader.close()
-
-      return result
+   fun fetchMovieDetailsById(imdbID: String, apiKey: String): String {
+      val apiUrl = "https://www.omdbapi.com/?i=$imdbID&apikey=$apiKey"
+      val request = Request.Builder().url(apiUrl).build()
+      httpClient.newCall(request).execute().use { response ->
+         return response.body?.string() ?: ""
+      }
    }
 }
